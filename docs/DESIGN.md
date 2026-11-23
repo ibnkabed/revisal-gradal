@@ -1,4 +1,6 @@
-# Gradal (iPhone only) — design
+# Design of Revisal & Gradal
+
+## Gradal
 
 Gradal is one iPhone app that does everything: a teacher adds a textbook PDF (Arabic or English, any
 subject), the linked AI providers write the questions, the teacher reviews them, and the phone makes the
@@ -11,7 +13,7 @@ Swift 5.10, iOS 17, SwiftUI, XcodeGen (`ios/project.yml`), built unsigned on Git
 port of; CI compares them where it can (`ios/OMRCheck`, a macOS command-line target that compiles the
 Foundation-only Swift files).
 
-## Shared types — `ios/Gradal/Model/Models.swift` (fixed; read it first)
+### Shared types — `ios/Gradal/Model/Models.swift` (fixed; read it first)
 
 `SchoolClass`, `Student`, `QuizSection`, `QuizHeader`, `SheetBox`, `SheetColumn`, `QuizSheet`, `Quiz`
 (one `key: [String]`, `language` "ar"/"en", `header: QuizHeader`, `paperId`), `Scan`, `Question`
@@ -20,12 +22,12 @@ Foundation-only Swift files).
 `Grading` (`Model/Grading.swift`): grade, perQuestion, display letters (أ ب ج د for Arabic).
 `SheetLayouts` (`OMR/SheetLayouts.swift`) decodes `shared/sheet-layouts.json`, including `print`.
 
-## Modules and their APIs
+### Modules and their APIs
 
 All user-facing strings are Arabic. Errors thrown to the UI conform to `LocalizedError` with an Arabic
 `errorDescription`. No module touches `Store` or SwiftUI views except where stated.
 
-### A. Sheet and paper rendering — `ios/Gradal/Sheet/`, `ios/Gradal/Paper/`
+#### A. Sheet and paper rendering — `ios/Gradal/Sheet/`, `ios/Gradal/Paper/`
 
 ```swift
 enum SheetGeometry {                         // Foundation only (also compiled into OMRCheck)
@@ -46,7 +48,7 @@ enum PaperPDF {                              // UIKit + WebKit
 }
 ```
 
-### B. AI, books, question writer — `ios/Gradal/AI/`, `ios/Gradal/Exam/`
+#### B. AI, books, question writer — `ios/Gradal/AI/`, `ios/Gradal/Exam/`
 
 The built-in AI is `FirebaseHybrid` (`AI/FirebaseHybrid.swift`, Firebase AI Logic): Apple Foundation Models on the
 device for a short prompt in a supported language, else Gemini in the cloud, with retries and a second model.
@@ -81,7 +83,7 @@ enum ExamMaker {
 }
 ```
 
-### C. Class lists and backup — `ios/Gradal/Import/`, `ios/Gradal/Backup/`, `ios/Gradal/Record/ZipReader.swift`
+#### C. Class lists and backup — `ios/Gradal/Import/`, `ios/Gradal/Backup/`, `ios/Gradal/Record/ZipReader.swift`
 
 ```swift
 struct ZipReader { init(_ data: Data) throws; var names: [String]; func data(_ name: String) throws -> Data }  // stored + deflate (Compression)
@@ -107,7 +109,7 @@ enum Backup {
 }
 ```
 
-### D. Store and screens — `ios/Gradal/Model/Store.swift`, `ios/Gradal/Views/`
+#### D. Store and screens — `ios/Gradal/Model/Store.swift`, `ios/Gradal/Views/`
 
 `Store` (ObservableObject, `Application Support/Gradal/store.json` + `books/` + `scans/` + `prints/`) holds
 classes, students, quizzes, scans, orphans, papers, books, settings; computes `quiz.sheet` with

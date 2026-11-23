@@ -1,4 +1,6 @@
-# Gradal: data and the answer sheet
+# Data of Revisal & Gradal
+
+## Gradal
 
 Everything lives on the iPhone, in `Application Support/Gradal/`:
 
@@ -10,7 +12,7 @@ Everything lives on the iPhone, in `Application Support/Gradal/`:
 A backup is a zip of `store.json`, `books/` and `scans/` (Settings → «انسخ بياناتك احتياطًا»). AI keys stay in the
 iPhone Keychain and are not in backups.
 
-## Answer sheet
+### Answer sheet
 
 `shared/sheet-layouts.json` (built by `shared/build_layouts.py`, read its docstring) describes the fixed parts of
 the paper: the header strip (school lines, the quiz's lines, an optional logo) — nobody reads it; four corner
@@ -27,7 +29,7 @@ and stores them in the quiz as `sheet` (`version` 4, `pitch`, `rtl`, `questionBu
 in millimetres on A4, `columns` with their boxes). The scanner reads the bubbles by choice index, so it is the same
 for both directions. The reader (`ios/Gradal/OMR/SheetReader.swift`) is a line-by-line port of `reference/omr.py`.
 
-## Records
+### Records
 
 ```jsonc
 // Class. prefix 1–9: the first digit of its students' IDs, unique among the classes not archived.
@@ -53,13 +55,13 @@ answer is exactly one letter and it is in key[i]. The newest scan per student co
 
 A true/false question is answered with bubble A (صح / True) or B (خطأ / False).
 
-## Record sheet (Excel)
+### Record sheet (Excel)
 
 One worksheet per class of the quiz (right to left): `ID`, `اسم الطالب`, `#`, `1` … `N`, one column per section
 (`=SUM()` over its questions), `المجموع` (`=C<r>`); one row per active student in list order, with the points
 earned on each question; a student with no scan keeps an empty row.
 
-## Class lists
+### Class lists
 
 From the teacher's Excel export of a class in Noor (xlsx, or the HTML table Noor saves as .xls), a PDF report from
 Noor (read by Gemini through the built-in Firebase AI Logic or a linked Gemini key, else by another provider from its text, else by Gradal's own text reader:
@@ -68,3 +70,22 @@ student added by hand (next free serial in his class, nobody else changes). Clas
 within the class (no spaces, أ/إ/آ→ا, ة→ه, ى→ي); a new student → the next free serial; everyone's order refreshed;
 students missing from a re-import of their class become inactive. **A new school year** archives every current
 class and its students (kept for the old results); prefixes and serials are free again.
+
+## Revisal
+
+Everything is on the phone, in `Application Support/Revisal/`:
+
+- `store.json` — one `StoreFile` (`ios/Revisal/Model/Store.swift`):
+  - `books`: each curriculum book (`id` = first 8 bytes of the PDF's SHA-256, `name`, `subject`, `pages`, `units`).
+    A unit has its pages, the `skills` the AI listed for it, `asked` (skill -> questions written) and `stems`
+    (normalised stems already asked, at most 400) so new reviews aim at the least-asked skills and never repeat.
+  - `sets`: the reviews (at most 200): title, `source` (track, book and unit or bank section, count), questions,
+    the student's `choices`, `finishedAt`.
+  - `bankSeen`: per bank, the question ids seen in the current round.
+  - `explanations`: bank question id -> the explanation the student asked for with «اشرح لي», for bank and المنهج questions alike (written once by the built-in hybrid AI or the student's own provider, Gemini when the question has a figure, an المنهج question with its unit's pages as the reference).
+  - each review set may carry `unitId`: the المنهج unit it was written from.
+  - `settings`: `explainEach` (the explanation right after each answer).
+- `books/<id>.pdf` — the added books.
+- `texts/<unitId>.txt` — a unit's text, read once (Gemini transcribes scanned pages), so later reviews cost one call.
+
+Decoders are lenient: a missing key takes its default. The backup (`Backup.swift`) zips the whole folder; a restore needs a `store.json` with `books`. AI keys are in the Keychain (service `io.github.ibnkabed.revisal`), never in the backup.
