@@ -2,7 +2,9 @@
 
 **One free, open-source iPhone project for the classroom, in two apps: Gradal for the teacher, Revisal for the student. Both run on the same built-in hybrid AI through Firebase AI Logic: on the iPhone with Apple's on-device model when it can, and with Gemini in the cloud when it must. No key to paste.**
 
-<!-- DEMO-VIDEO -->
+[![Watch the demo video](https://img.youtube.com/vi/nQApLRJ69KU/hqdefault.jpg)](https://youtu.be/nQApLRJ69KU)
+
+**[Watch it on YouTube](https://youtu.be/nQApLRJ69KU)**: both real apps in the iOS simulator, with live Firebase AI Logic calls.
 
 | | **Gradal**, for the teacher | **Revisal**, for the student |
 |---|---|---|
