@@ -2,7 +2,7 @@
 
 <h1 align="center">Gradal: AI-written quizzes, graded with the phone camera</h1>
 
-<p align="center"><a href="README.md">العربية</a> · <a href="https://github.com/ibnkabed/gradal/releases">Releases</a></p>
+<p align="center"><a href="README.md">العربية</a> · <a href="https://github.com/ibnkabed/revisal-gradal/releases">Releases</a></p>
 
 Gradal is a free, open-source iPhone app for teachers. It works alone, with no computer.
 
@@ -65,7 +65,7 @@ Gradal existed before the hackathon, with AI only through keys the teacher paste
 
 ## Install
 
-Download the latest `Gradal-unsigned.ipa` from [Releases](https://github.com/ibnkabed/gradal/releases) and install it with [Sideloadly](https://sideloadly.io/) and a free Apple ID.
+Download the latest `Gradal-unsigned.ipa` from [Releases](https://github.com/ibnkabed/revisal-gradal/releases) and install it with [Sideloadly](https://sideloadly.io/) and a free Apple ID.
 
 **Requirements:**
 

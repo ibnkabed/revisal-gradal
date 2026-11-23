@@ -1,6 +1,6 @@
 # Revisal
 
-**[⬇️ Download the app (Revisal-unsigned.ipa)](https://github.com/ibnkabed/revisal/releases/latest/download/Revisal-unsigned.ipa)** · [العربية](README.md) · [All releases](https://github.com/ibnkabed/revisal/releases)
+**[⬇️ Download the app (Revisal-unsigned.ipa)](https://github.com/ibnkabed/revisal-gradal/releases/latest/download/Revisal-unsigned.ipa)** · [العربية](README.md) · [All releases](https://github.com/ibnkabed/revisal-gradal/releases)
 
 Revisal is a free, open-source iPhone app that helps students review what they studied: for their school subjects, and for Saudi Arabia's national exams, Qudrat (General Aptitude) and Tahsili (Achievement). Every question is multiple choice with four options, and everything is solved on the phone. There's no printing and no paper.
 
@@ -65,7 +65,7 @@ Revisal existed before the hackathon, with AI only through keys the student past
 
 ## Install
 
-Download the latest `Revisal-unsigned.ipa` from [Releases](https://github.com/ibnkabed/revisal/releases) and install it with [Sideloadly](https://sideloadly.io/) and a free Apple ID.
+Download the latest `Revisal-unsigned.ipa` from [Releases](https://github.com/ibnkabed/revisal-gradal/releases) and install it with [Sideloadly](https://sideloadly.io/) and a free Apple ID.
 
 **Requirements:**
 

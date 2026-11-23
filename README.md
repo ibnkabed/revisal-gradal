@@ -11,7 +11,7 @@
 | Job | Writes quizzes from the textbook, prints the papers, grades them with the camera | Reviews what the student studied, with questions solved on the phone |
 | AI | Writes the questions from the book's pages | Writes review questions from the book, and explains any answer on request |
 | Also | Students imported from Excel or PDF, offline camera grading, results and an Excel gradebook | 6,011 bundled Qudrat and Tahsili questions that work offline, results by skill, retry my mistakes |
-| Download | [Gradal-unsigned.ipa](https://github.com/ibnkabed/gradal/releases/latest/download/Gradal-unsigned.ipa) | [Revisal-unsigned.ipa](https://github.com/ibnkabed/revisal/releases/latest/download/Revisal-unsigned.ipa) |
+| Download | [Gradal-unsigned.ipa](https://github.com/ibnkabed/revisal-gradal/releases/latest/download/Gradal-unsigned.ipa) | [Revisal-unsigned.ipa](https://github.com/ibnkabed/revisal-gradal/releases/latest/download/Revisal-unsigned.ipa) |
 | Code | [`gradal/`](gradal/) | [`revisal/`](revisal/) |
 
 Each user installs the app for their role: a teacher takes Gradal, a student takes Revisal. They were built as two apps because each is a full app on its own, and one app holding both would be heavy for everyone.

@@ -1,6 +1,6 @@
 # Revisal
 
-**[⬇️ تنزيل التطبيق (Revisal-unsigned.ipa)](https://github.com/ibnkabed/revisal/releases/latest/download/Revisal-unsigned.ipa)** · [دليل الاستخدام](دليل-الاستخدام.md) · [كل الإصدارات](https://github.com/ibnkabed/revisal/releases) · [English](README.en.md)
+**[⬇️ تنزيل التطبيق (Revisal-unsigned.ipa)](https://github.com/ibnkabed/revisal-gradal/releases/latest/download/Revisal-unsigned.ipa)** · [دليل الاستخدام](دليل-الاستخدام.md) · [كل الإصدارات](https://github.com/ibnkabed/revisal-gradal/releases) · [English](README.en.md)
 
 تطبيق آيفون مجاني ومفتوح المصدر يساعد الطالب على مراجعة ما ذاكره، في المواد الدراسية وفي اختبارات قياس (القدرات والتحصيلي)، بأسئلة «اختر الإجابة الصحيحة» من أربعة خيارات. وكل الحل على الجوال نفسه: لا طباعة ولا أوراق.
 
@@ -36,7 +36,7 @@
 
 ## التثبيت
 
-نزّل أحدث `Revisal-unsigned.ipa` من صفحة [الإصدارات](https://github.com/ibnkabed/revisal/releases)، وثبّته بـ [Sideloadly](https://sideloadly.io/) وحساب Apple مجاني. والخطوات كاملة في [دليل الاستخدام](دليل-الاستخدام.md).
+نزّل أحدث `Revisal-unsigned.ipa` من صفحة [الإصدارات](https://github.com/ibnkabed/revisal-gradal/releases)، وثبّته بـ [Sideloadly](https://sideloadly.io/) وحساب Apple مجاني. والخطوات كاملة في [دليل الاستخدام](دليل-الاستخدام.md).
 
 ## الذكاء الاصطناعي المدمج
 
@@ -64,7 +64,7 @@
 
 ## المساهمة
 
-الملاحظات والاقتراحات وتصحيح الأسئلة مرحب بها عبر [Issues](https://github.com/ibnkabed/revisal/issues)، والتفاصيل في [دليل المساهمة](CONTRIBUTING.md).
+الملاحظات والاقتراحات وتصحيح الأسئلة مرحب بها عبر [Issues](https://github.com/ibnkabed/revisal-gradal/issues)، والتفاصيل في [دليل المساهمة](CONTRIBUTING.md).
 
 ## الترخيص
 

@@ -5,7 +5,7 @@
 <h1 align="center">Gradal — اختبارات تُكتب بالذكاء الاصطناعي وتُصحَّح بكاميرا الجوال</h1>
 
 <p align="center">
-<a href="https://github.com/ibnkabed/gradal/actions/workflows/build-ipa.yml"><img src="https://github.com/ibnkabed/gradal/actions/workflows/build-ipa.yml/badge.svg" alt="حالة البناء"></a>
+<a href="https://github.com/ibnkabed/revisal-gradal/actions/workflows/build.yml"><img src="https://github.com/ibnkabed/revisal-gradal/actions/workflows/build.yml/badge.svg" alt="حالة البناء"></a>
 <a href="LICENSE"><img src="https://img.shields.io/badge/الترخيص-MIT-green.svg" alt="الترخيص MIT"></a>
 </p>
 
@@ -64,7 +64,7 @@
 
 التطبيق غير منشور في App Store بعد، فيُثبَّت من ملف IPA:
 
-1. نزّل `Gradal-unsigned.ipa` من صفحة **[الإصدارات](https://github.com/ibnkabed/gradal/releases)**.
+1. نزّل `Gradal-unsigned.ipa` من صفحة **[الإصدارات](https://github.com/ibnkabed/revisal-gradal/releases)**.
 2. ثبّته على الآيفون بأداة [Sideloadly](https://sideloadly.io/) وحساب Apple عادي.
 3. في الآيفون: الإعدادات ← عام ← VPN وإدارة الأجهزة، ثم وثّق حسابك.
 

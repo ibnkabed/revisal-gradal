@@ -1,15 +1,12 @@
 # Builds both iPhone apps as unsigned IPAs for Sideloadly, each after its own checks (Gradal: the sheet reader on
-# synthetic photos; Revisal: the review rules and the bundled banks). Run by hand, or by a pushed tag v*, which also
-# attaches both IPAs to a GitHub Release. The built-in AI needs the repository secrets
+# synthetic photos; Revisal: the review rules and the bundled banks). Run by hand; the release job runs only when
+# started from a tag v*, and then attaches both IPAs to that GitHub Release. The built-in AI needs the repository secrets
 # GRADAL_GOOGLE_SERVICE_INFO_PLIST_B64, REVISAL_GOOGLE_SERVICE_INFO_PLIST_B64 and APP_CHECK_DEBUG_TOKEN; without them
 # each app builds with the built-in AI left out.
 name: Build both IPAs
 
 on:
   workflow_dispatch:
-  push:
-    tags:
-      - "v*"
 
 permissions:
   contents: read

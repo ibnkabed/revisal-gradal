@@ -4,7 +4,7 @@
 
 ## الإبلاغ عن خطأ أو سؤال غير صحيح
 
-افتح [Issue](https://github.com/ibnkabed/revisal/issues) واذكر فيه:
+افتح [Issue](https://github.com/ibnkabed/revisal-gradal/issues) واذكر فيه:
 
 - القسم (المنهج أو التحصيلي أو القدرات) والمادة أو المهارة.
 - نص السؤال كما ظهر، والإجابة التي تراها صحيحة وسببها.

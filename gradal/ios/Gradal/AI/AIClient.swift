@@ -25,7 +25,7 @@ struct LinkedProvider: Codable, Hashable, Identifiable {
 final class AIClient: ObservableObject {
     static let shared = AIClient()
 
-    static let userAgent = "Gradal/1.0 (+https://github.com/ibnkabed/gradal)"
+    static let userAgent = "Gradal/1.0 (+https://github.com/ibnkabed/revisal-gradal)"
     private static let defaultsKey = "gradal.ai.linked"
 
     /// Kept in `AIProviders.all` order; persisted as JSON in UserDefaults.
@@ -232,7 +232,7 @@ final class AIClient: ObservableObject {
         req.setValue("Bearer \(key)", forHTTPHeaderField: "Authorization")
         req.setValue("application/json", forHTTPHeaderField: "Content-Type")
         req.setValue(Self.userAgent, forHTTPHeaderField: "User-Agent")
-        req.setValue("https://github.com/ibnkabed/gradal", forHTTPHeaderField: "HTTP-Referer")
+        req.setValue("https://github.com/ibnkabed/revisal-gradal", forHTTPHeaderField: "HTTP-Referer")
         req.setValue("Gradal", forHTTPHeaderField: "X-Title")
         if let body {
             req.httpBody = try JSONSerialization.data(withJSONObject: body)

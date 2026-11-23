@@ -68,7 +68,7 @@ struct SettingsView: View {
 
                 Section("عن التطبيق") {
                     LabeledContent("النسخة", value: appVersion)
-                    Link("Revisal على GitHub", destination: URL(string: "https://github.com/ibnkabed/revisal")!)
+                    Link("Revisal على GitHub", destination: URL(string: "https://github.com/ibnkabed/revisal-gradal")!)
                     Text("مجاني ومفتوح المصدر. يراجع معك أي منهج بأسئلة «اختر الإجابة الصحيحة» يكتبها الذكاء الاصطناعي من كتابك أو ملخصك، ومعه بنكا التحصيلي والقدرات.")
                         .font(.footnote)
                         .foregroundColor(.secondary)
