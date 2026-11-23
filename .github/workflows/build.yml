@@ -1,0 +1,310 @@
+# Builds both iPhone apps as unsigned IPAs for Sideloadly, each after its own checks (Gradal: the sheet reader on
+# synthetic photos; Revisal: the review rules and the bundled banks). Run by hand, or by a pushed tag v*, which also
+# attaches both IPAs to a GitHub Release. The built-in AI needs the repository secrets
+# GRADAL_GOOGLE_SERVICE_INFO_PLIST_B64, REVISAL_GOOGLE_SERVICE_INFO_PLIST_B64 and APP_CHECK_DEBUG_TOKEN; without them
+# each app builds with the built-in AI left out.
+name: Build both IPAs
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: read
+
+jobs:
+  gradal:
+    name: Check OMR and build unsigned Gradal IPA
+    runs-on: xcode-27
+    defaults:
+      run:
+        working-directory: gradal
+    timeout-minutes: 45
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v6
+        with:
+          sparse-checkout: |
+            gradal/ios
+            gradal/shared
+            gradal/tools
+            gradal/reference/omr.py
+            gradal/reference/sheet_layout.py
+          sparse-checkout-cone-mode: false
+
+      - name: Number this build (CFBundleVersion = Info.plist base + run number)
+        # The base in Info.plist is never lowered; the run number only grows, so every IPA is newer.
+        # CFBundleShortVersionString is raised by hand in Info.plist for every release with a visible change.
+        run: |
+          set -euo pipefail
+          plist=ios/Gradal/Info.plist
+          base=$(/usr/libexec/PlistBuddy -c "Print :CFBundleVersion" "$plist")
+          build=$((base + ${{ github.run_number }}))
+          /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $build" "$plist"
+          short=$(/usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" "$plist")
+          echo "GRADAL_BUILD=$build" >> "$GITHUB_ENV"
+          echo "Gradal $short ($build)" | tee -a "$GITHUB_STEP_SUMMARY"
+
+      - name: Add the Firebase config from the repository secret
+        env:
+          PLIST_B64: ${{ secrets.GRADAL_GOOGLE_SERVICE_INFO_PLIST_B64 }}
+        run: |
+          set -euo pipefail
+          if [ -n "$PLIST_B64" ]; then
+            echo "$PLIST_B64" | base64 --decode > ios/Gradal/GoogleService-Info.plist
+            plutil -lint ios/Gradal/GoogleService-Info.plist
+          else
+            echo "No Firebase secret: the built-in AI is left out of this build"
+          fi
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Generate Xcode project
+        working-directory: gradal/ios
+        run: xcodegen generate
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Make synthetic test sheets
+        run: |
+          set -euo pipefail
+          python -m pip install --quiet pillow numpy opencv-python-headless openpyxl
+          python tools/make_test_sheets.py 40 "$RUNNER_TEMP/sheets" 1448
+
+      - name: Build OMRCheck
+        run: |
+          set -euo pipefail
+          xcodebuild \
+            -project ios/Gradal.xcodeproj \
+            -scheme OMRCheck \
+            -configuration Release \
+            -destination 'platform=macOS,arch=arm64' \
+            -derivedDataPath "$RUNNER_TEMP/omr-build" \
+            build
+
+      - name: Check the question writer's rules (clean, balance, JSON, model choice)
+        run: |
+          set -euo pipefail
+          "$RUNNER_TEMP/omr-build/Build/Products/Release/OMRCheck" --exam-selftest
+
+      - name: Run the Swift reader on the test sheets
+        run: |
+          set -euo pipefail
+          "$RUNNER_TEMP/omr-build/Build/Products/Release/OMRCheck" "$RUNNER_TEMP/sheets" shared/sheet-layouts.json
+
+      - name: Draw the correction copies of test sheets (green and red rings, points, score)
+        run: |
+          set -euo pipefail
+          "$RUNNER_TEMP/omr-build/Build/Products/Release/OMRCheck" --graded "$RUNNER_TEMP/sheets" shared/sheet-layouts.json "$RUNNER_TEMP/graded"
+
+      - name: Upload the correction copies
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: graded-papers
+          path: ${{ runner.temp }}/graded
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Check the record sheet written by the Swift xlsx writer
+        run: |
+          set -euo pipefail
+          "$RUNNER_TEMP/omr-build/Build/Products/Release/OMRCheck" --xlsx "$RUNNER_TEMP/record.xlsx"
+          python tools/check_record_xlsx.py "$RUNNER_TEMP/record.xlsx"
+
+      - name: Check class list import, roster merge and the zip reader
+        run: |
+          set -euo pipefail
+          "$RUNNER_TEMP/omr-build/Build/Products/Release/OMRCheck" --import-selftest
+
+      - name: Compare the Swift sheet geometry with the Python reference
+        run: |
+          set -euo pipefail
+          python tools/check_geometry.py make "$RUNNER_TEMP/geometry-in.json" 200 1448
+          "$RUNNER_TEMP/omr-build/Build/Products/Release/OMRCheck" --geometry "$RUNNER_TEMP/geometry-in.json" "$RUNNER_TEMP/geometry-swift.json" shared/sheet-layouts.json
+          python tools/check_geometry.py compare "$RUNNER_TEMP/geometry-in.json" "$RUNNER_TEMP/geometry-swift.json"
+
+      - name: Render answer sheets with the app's drawing and read them back
+        run: |
+          set -euo pipefail
+          "$RUNNER_TEMP/omr-build/Build/Products/Release/OMRCheck" --sheet-selftest shared/sheet-layouts.json "$RUNNER_TEMP/sheet-png"
+
+      - name: Upload the rendered sheets
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rendered-sheets
+          path: ${{ runner.temp }}/sheet-png
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Build for a physical iPhone without signing
+        env:
+          APP_CHECK_DEBUG_TOKEN: ${{ secrets.APP_CHECK_DEBUG_TOKEN }}
+        run: |
+          set -euo pipefail
+          xcodebuild \
+            -project ios/Gradal.xcodeproj \
+            -scheme Gradal \
+            -configuration Release \
+            -sdk iphoneos \
+            -destination 'generic/platform=iOS' \
+            -derivedDataPath ios/build \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY='' \
+            APP_CHECK_DEBUG_TOKEN="${APP_CHECK_DEBUG_TOKEN:-}" \
+            build
+
+      - name: Package unsigned IPA
+        run: |
+          set -euo pipefail
+          app_path="ios/build/Build/Products/Release-iphoneos/Gradal.app"
+          test -d "$app_path"
+          mkdir -p artifact/Payload
+          ditto "$app_path" "artifact/Payload/Gradal.app"
+          cd artifact
+          got=$(/usr/libexec/PlistBuddy -c "Print :CFBundleVersion" Payload/Gradal.app/Info.plist)
+          test "$got" = "$GRADAL_BUILD"
+          /usr/bin/zip -qry Gradal-unsigned.ipa Payload
+          shasum -a 256 Gradal-unsigned.ipa > Gradal-unsigned.ipa.sha256
+
+      - name: Upload IPA artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Gradal-unsigned-IPA
+          path: |
+            gradal/artifact/Gradal-unsigned.ipa
+            gradal/artifact/Gradal-unsigned.ipa.sha256
+          if-no-files-found: error
+          retention-days: 14
+
+  revisal:
+    name: Check the rules and build the unsigned Revisal IPA
+    # macOS minutes are free on the public repository only; the private copy builds by hand.
+    if: github.repository == 'ibnkabed/revisal-gradal' || github.event_name == 'workflow_dispatch'
+    runs-on: xcode-27
+    defaults:
+      run:
+        working-directory: revisal
+    timeout-minutes: 45
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v6
+
+      - name: Add the Firebase config from the repository secret
+        env:
+          PLIST_B64: ${{ secrets.REVISAL_GOOGLE_SERVICE_INFO_PLIST_B64 }}
+        run: |
+          set -euo pipefail
+          if [ -n "$PLIST_B64" ]; then
+            echo "$PLIST_B64" | base64 --decode > ios/Revisal/GoogleService-Info.plist
+            plutil -lint ios/Revisal/GoogleService-Info.plist
+          else
+            echo "No Firebase secret: the built-in AI is left out of this build"
+          fi
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Generate Xcode project
+        working-directory: revisal/ios
+        run: xcodegen generate
+
+      - name: Build RevisalCheck
+        run: |
+          set -euo pipefail
+          xcodebuild \
+            -project ios/Revisal.xcodeproj \
+            -scheme RevisalCheck \
+            -configuration Release \
+            -destination 'platform=macOS,arch=arm64' \
+            -derivedDataPath "$RUNNER_TEMP/check-build" \
+            build
+
+      - name: Check the review writer's rules (checks, skills, targets, balance)
+        run: |
+          set -euo pipefail
+          "$RUNNER_TEMP/check-build/Build/Products/Release/RevisalCheck" --review-selftest
+
+      - name: Check the bank draw (no repeats until the bank is done)
+        run: |
+          set -euo pipefail
+          "$RUNNER_TEMP/check-build/Build/Products/Release/RevisalCheck" --bank-selftest
+
+      - name: Check the bundled question banks
+        run: |
+          set -euo pipefail
+          "$RUNNER_TEMP/check-build/Build/Products/Release/RevisalCheck" --bank-check bank
+
+      - name: Build for a physical iPhone without signing
+        env:
+          APP_CHECK_DEBUG_TOKEN: ${{ secrets.APP_CHECK_DEBUG_TOKEN }}
+        run: |
+          set -euo pipefail
+          xcodebuild \
+            -project ios/Revisal.xcodeproj \
+            -scheme Revisal \
+            -configuration Release \
+            -sdk iphoneos \
+            -destination 'generic/platform=iOS' \
+            -derivedDataPath ios/build \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY='' \
+            APP_CHECK_DEBUG_TOKEN="${APP_CHECK_DEBUG_TOKEN:-}" \
+            build
+
+      - name: Package unsigned IPA
+        run: |
+          set -euo pipefail
+          app_path="ios/build/Build/Products/Release-iphoneos/Revisal.app"
+          test -d "$app_path"
+          test -f "$app_path/bank/qudurat.json"
+          mkdir -p artifact/Payload
+          ditto "$app_path" "artifact/Payload/Revisal.app"
+          cd artifact
+          /usr/bin/zip -qry Revisal-unsigned.ipa Payload
+          shasum -a 256 Revisal-unsigned.ipa > Revisal-unsigned.ipa.sha256
+
+      - name: Upload IPA artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Revisal-unsigned-IPA
+          path: |
+            revisal/artifact/Revisal-unsigned.ipa
+            revisal/artifact/Revisal-unsigned.ipa.sha256
+          if-no-files-found: error
+          retention-days: 14
+
+  release:
+    name: Attach both IPAs to the release
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [gradal, revisal]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: Gradal-unsigned-IPA
+          path: artifact
+      - uses: actions/download-artifact@v4
+        with:
+          name: Revisal-unsigned-IPA
+          path: artifact
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            artifact/Gradal-unsigned.ipa
+            artifact/Gradal-unsigned.ipa.sha256
+            artifact/Revisal-unsigned.ipa
+            artifact/Revisal-unsigned.ipa.sha256

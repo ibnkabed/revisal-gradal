@@ -1,0 +1,9 @@
+.DS_Store
+Thumbs.db
+__pycache__/
+*.pyc
+# local only: rules, notes, exports and backups
+/CLAUDE.md
+/NOTES.md
+/exports/
+/backups/

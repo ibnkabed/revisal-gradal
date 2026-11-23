@@ -1,0 +1,26 @@
+name: Tests
+
+on:
+  push:
+    paths: ["gradal/**", ".github/workflows/gradal-tests.yml"]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  reference:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: gradal
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - name: Reference reader on synthetic photos (Arabic and English sheets)
+        run: |
+          python -m pip install pillow numpy opencv-python-headless
+          python tools/make_test_sheets.py 40 "$RUNNER_TEMP/sheets" 1448
+          python tools/check_omr.py "$RUNNER_TEMP/sheets"

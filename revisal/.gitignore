@@ -1,0 +1,29 @@
+# النسخ الاحتياطية المحلية
+/backups/
+# الأسرار لا تُرفع أبدًا
+.env
+*.key
+# ما يُعاد توليده
+__pycache__/
+*.pyc
+.venv/
+node_modules/
+# بناء Xcode يُعاد توليده
+ios/build/
+ios/*.xcodeproj/
+.DS_Store
+Thumbs.db
+# ملفات PDF المصدر للبنكين لا تُرفع (حقوقها لأصحابها)، ويُرفع البنك المستخرج منها
+/المصادر/
+/.bank-cache/
+/.bank-work/
+/tools/
+/docs/BANK.md
+/docs/README.md
+/*.txt
+
+# مقاطع العرض ومخرجاتها تُرفع إلى YouTube لا إلى المستودع
+/exports/
+
+# Firebase app config: written by CI from the GOOGLE_SERVICE_INFO_PLIST_B64 secret, never committed
+GoogleService-Info.plist

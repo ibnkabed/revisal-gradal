@@ -1,0 +1,103 @@
+# Demo footage for the #BuildHybridAI video (2026-11-23): builds Gradal for the iOS simulator with the
+# Firebase config and App Check debug token from the repository secrets, then opens each demo screen
+# (`-demo <screen>`, sample data in its own folder) in the chosen language and records it. Screens marked live
+# call the built-in AI through Firebase AI Logic for real. Run by hand; the clips and stills come back as the
+# artifact `demo-video`.
+name: Gradal demo video
+
+on:
+  workflow_dispatch:
+    inputs:
+      language:
+        description: en or ar
+        default: en
+
+permissions:
+  contents: read
+
+jobs:
+  record:
+    runs-on: xcode-27
+    defaults:
+      run:
+        working-directory: gradal
+    timeout-minutes: 60
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v6
+
+      - name: Add the Firebase config from the repository secret
+        env:
+          PLIST_B64: ${{ secrets.GRADAL_GOOGLE_SERVICE_INFO_PLIST_B64 }}
+        run: |
+          set -euo pipefail
+          echo "$PLIST_B64" | base64 --decode > ios/Gradal/GoogleService-Info.plist
+          plutil -lint ios/Gradal/GoogleService-Info.plist
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Generate Xcode project
+        working-directory: gradal/ios
+        run: xcodegen generate
+
+      - name: Pick and boot an iPhone simulator
+        run: |
+          set -euo pipefail
+          udid=$(xcrun simctl list devices available -j | python3 -c '
+          import json, sys
+          devs = [d for rt, ds in json.load(sys.stdin)["devices"].items() if "iOS" in rt for d in ds]
+          pro = [d for d in devs if "Pro Max" not in d["name"] and "Pro" in d["name"] and d["name"].startswith("iPhone")]
+          print((pro or [d for d in devs if d["name"].startswith("iPhone")])[-1]["udid"])')
+          echo "UDID=$udid" >> "$GITHUB_ENV"
+          xcrun simctl boot "$udid"
+          xcrun simctl bootstatus "$udid" -b
+          xcrun simctl status_bar "$udid" override --time "9:41" --batteryState charged --batteryLevel 100 --cellularBars 4 --wifiBars 3
+
+      - name: Build for the simulator
+        env:
+          APP_CHECK_DEBUG_TOKEN: ${{ secrets.APP_CHECK_DEBUG_TOKEN }}
+        run: |
+          set -euo pipefail
+          xcodebuild \
+            -project ios/Gradal.xcodeproj \
+            -scheme Gradal \
+            -configuration Debug \
+            -destination "id=$UDID" \
+            -derivedDataPath ios/build \
+            CODE_SIGN_IDENTITY=- CODE_SIGN_STYLE=Manual DEVELOPMENT_TEAM= \
+            APP_CHECK_DEBUG_TOKEN="$APP_CHECK_DEBUG_TOKEN" \
+            build
+
+      - name: Record the demo screens
+        run: |
+          set -euo pipefail
+          lang="${{ inputs.language || 'en' }}"
+          app=$(ls -d ios/build/Build/Products/Debug-iphonesimulator/Gradal.app)
+          bundle=$(/usr/libexec/PlistBuddy -c 'Print CFBundleIdentifier' "$app/Info.plist")
+          xcrun simctl install "$UDID" "$app"
+          mkdir -p demo
+          # screen:seconds (live screens wait for the real AI reply)
+          for item in quizzes:6 write:150 students:6 detail:7 settings:7; do
+            screen="${item%%:*}"; secs="${item##*:}"
+            xcrun simctl terminate "$UDID" "$bundle" || true
+            xcrun simctl io "$UDID" recordVideo --codec=h264 --force "demo/$screen.mov" &
+            rec=$!
+            sleep 1
+            # ad-hoc signed above so Firebase can use the simulator keychain; the app's output goes to a log
+            xcrun simctl launch --stdout="$PWD/demo/$screen.log" --stderr="$PWD/demo/$screen.log" \
+              "$UDID" "$bundle" -demo "$screen" -AppleLanguages "($lang)" -AppleLocale "${lang}_US"
+            sleep "$secs"
+            xcrun simctl io "$UDID" screenshot "demo/$screen.png"
+            kill -INT "$rec"; wait "$rec" || true
+          done
+          xcrun simctl spawn "$UDID" log show --last 15m --predicate 'process == "Gradal"' --style compact > demo/app-log.txt || true
+          grep -h "FirebaseHybrid\|rror" demo/*.log | grep -v -i "token" | tail -60 || true
+          ls -l demo
+
+      - name: Upload the footage
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: demo-video
+          path: gradal/demo/
