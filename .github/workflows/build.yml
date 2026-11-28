@@ -186,7 +186,7 @@ jobs:
   revisal:
     name: Check the rules and build the unsigned Revisal IPA
     # macOS minutes are free on the public repository only; the private copy builds by hand.
-    if: github.repository == 'ibnkabed/revisal-gradal' || github.event_name == 'workflow_dispatch'
+    if: github.repository == 'ibnkabed/revisal-gradal-firebase' || github.event_name == 'workflow_dispatch'
     runs-on: xcode-27
     defaults:
       run:

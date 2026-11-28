@@ -4,7 +4,7 @@
 
 <p align="center"><b>One free, open-source iPhone project for the classroom, in two apps: Gradal for the teacher, Revisal for the student. Both run on the same built-in hybrid AI through Firebase AI Logic. No key to paste.</b></p>
 
-<p align="center"><a href="https://github.com/ibnkabed/revisal-gradal/releases/latest/download/Gradal-unsigned.ipa">⬇️ Gradal (teacher)</a> · <a href="https://github.com/ibnkabed/revisal-gradal/releases/latest/download/Revisal-unsigned.ipa">⬇️ Revisal (student)</a> · <a href="https://github.com/ibnkabed/revisal-gradal/releases">Releases</a> · <a href="دليل-الاستخدام.md">دليل الاستخدام (Arabic guide)</a></p>
+<p align="center"><a href="https://github.com/ibnkabed/revisal-gradal-firebase/releases/latest/download/Gradal-unsigned.ipa">⬇️ Gradal (teacher)</a> · <a href="https://github.com/ibnkabed/revisal-gradal-firebase/releases/latest/download/Revisal-unsigned.ipa">⬇️ Revisal (student)</a> · <a href="https://github.com/ibnkabed/revisal-gradal-firebase/releases">Releases</a> · <a href="دليل-الاستخدام.md">دليل الاستخدام (Arabic guide)</a></p>
 
 [![Watch the demo video](https://img.youtube.com/vi/nQApLRJ69KU/hqdefault.jpg)](https://youtu.be/nQApLRJ69KU)
 
@@ -64,7 +64,7 @@ Gradal (v2.7) and Revisal (v1.0) existed before the hackathon, with AI only thro
 
 ## Install
 
-1. Download the app for your role from the [latest release](https://github.com/ibnkabed/revisal-gradal/releases/latest): `Gradal-unsigned.ipa` for the teacher, `Revisal-unsigned.ipa` for the student.
+1. Download the app for your role from the [latest release](https://github.com/ibnkabed/revisal-gradal-firebase/releases/latest): `Gradal-unsigned.ipa` for the teacher, `Revisal-unsigned.ipa` for the student.
 2. Install it with [Sideloadly](https://sideloadly.io/) and a free Apple ID.
 3. Open **Settings → Built-in AI**: it shows "Ready with no key" and whether Apple's on-device model is available.
 

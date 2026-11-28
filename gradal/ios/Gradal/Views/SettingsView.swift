@@ -94,7 +94,7 @@ struct SettingsView: View {
 
                 Section("عن التطبيق") {
                     LabeledContent("النسخة", value: appVersion)
-                    Link("Gradal على GitHub", destination: URL(string: "https://github.com/ibnkabed/revisal-gradal")!)
+                    Link("Gradal على GitHub", destination: URL(string: "https://github.com/ibnkabed/revisal-gradal-firebase")!)
                     Text("مجاني ومفتوح المصدر. يكتب الاختبار من كتابك بالذكاء الاصطناعي، ويطبع أوراقه، ويصححها بالكاميرا.")
                         .font(.footnote)
                         .foregroundColor(.secondary)

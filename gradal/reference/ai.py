@@ -25,7 +25,7 @@ import urllib.request
 
 from store import now_iso
 
-UA = "Gradal/1.0 (+https://github.com/ibnkabed/revisal-gradal)"
+UA = "Gradal/1.0 (+https://github.com/ibnkabed/revisal-gradal-firebase)"
 
 # order = the order of use: free and good at Arabic first, the cheap paid one last
 PROVIDERS = [
@@ -76,7 +76,7 @@ def _request(url: str, key: str, body: dict | None = None, timeout: float = 120)
     data = json.dumps(body).encode("utf-8") if body is not None else None
     req = urllib.request.Request(url, data=data, method="POST" if body is not None else "GET",
                                  headers={"Authorization": f"Bearer {key}", "Content-Type": "application/json",
-                                          "User-Agent": UA, "HTTP-Referer": "https://github.com/ibnkabed/revisal-gradal",
+                                          "User-Agent": UA, "HTTP-Referer": "https://github.com/ibnkabed/revisal-gradal-firebase",
                                           "X-Title": "Gradal"})
     with urllib.request.urlopen(req, timeout=timeout) as r:
         return json.loads(r.read().decode("utf-8"))

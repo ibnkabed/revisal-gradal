@@ -4,7 +4,7 @@ Thank you for helping improve Gradal (the teacher's app) and Revisal (the studen
 
 ## Report a bug or a wrong question
 
-Open an [issue](https://github.com/ibnkabed/revisal-gradal/issues) and include:
+Open an [issue](https://github.com/ibnkabed/revisal-gradal-firebase/issues) and include:
 
 - The app (Gradal or Revisal) and its version from **Settings**.
 - What you did, what you expected, and what happened, with a screenshot if you can.
